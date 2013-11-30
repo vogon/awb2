@@ -3,6 +3,8 @@ var express = require('express'),
     server = require('http').createServer(app),
     cloak = require('cloak');
 
+var Game = require('./game.js');
+
 var preferMinify = true;
 
 app.serveClientLibrary = function (serverPath, library, minifiedRel, unminifiedRel) {
@@ -42,10 +44,25 @@ cloak.configure({
   lobby: {
 
   },
-  room: {
 
+  room: {
+    init: function () {
+      this.data = new Game();
+      this.data.name = this.name;
+    },
+
+    newMember: function(user) {
+      user.message('joinedroom', { room: user.getRoom().data });
+    }
   },
+
   messages: {
+    'newroom': function(msg, user) {
+      var room = cloak.createRoom('butts', 5);
+      
+      room.addMember(user);
+    },
+
     'chatsent': function(msg, user) {
       console.log('received chatsent: msg = ' + msg);
       user.getRoom().messageMembers('chat', { user: user.name, msg: msg });

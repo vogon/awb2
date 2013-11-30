@@ -30,6 +30,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
+    <Compile Include="game.js" />
     <Compile Include="public\js\awb.js" />
     <Content Include="package.json" />
     <Content Include="public\index.html" />
