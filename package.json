@@ -1,0 +1,15 @@
+{
+  "name": "Awb",
+  "version": "0.0.0",
+  "description": "Awb",
+  "main": "app.js",
+  "author": {
+    "name": "Colin",
+    "email": ""
+  },
+  "dependencies": {
+    "cloak": "~0.2.0",
+    "underscore": "~1.5.2",
+    "express": "~3.4.5"
+  }
+}
