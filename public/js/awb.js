@@ -9,7 +9,7 @@ var chatlogLineTemplate = compileTemplateFromSelector('#chatlog-line-template');
 $('#chat-form').submit(function (e) {
   var chatLine = $('#chat-line');
 
-  cloak.message('chatsent', chatLine.val());
+  cloak.message(common.ROOM_CHAT_SENT, chatLine.val());
   chatLine.val('');
 
   event.preventDefault();

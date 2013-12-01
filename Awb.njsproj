@@ -32,6 +32,7 @@
     <Compile Include="app.js" />
     <Compile Include="game.js" />
     <Compile Include="public\js\awb.js" />
+    <Compile Include="public\js\common.js" />
     <Content Include="less\main.less" />
     <Content Include="package.json" />
     <Content Include="public\index.html" />

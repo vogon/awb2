@@ -41,7 +41,9 @@ app.serveClientLibrary('/lib/underscore.js', 'underscore', '/underscore-min.js',
 app.serveClientLibrary('/lib/cloak-client.js', 'cloak', '/cloak-client.min.js', '/cloak-client.js');
 app.serveClientLibrary('/lib/handlebars.js', 'handlebars', '/../dist/handlebars.min.js', '/../dist/handlebars.js');
 
-cloak.configure({
+var common = require('./public/js/common.js');
+
+var cloakConfig = {
   express: server,
   autoJoinLobby: true,
   autoCreateRooms: false,
@@ -61,19 +63,21 @@ cloak.configure({
     }
   },
 
-  messages: {
-    'newroom': function(msg, user) {
-      var room = cloak.createRoom('butts', 5);
-      
-      room.addMember(user);
-    },
+  messages: {}
+};
 
-    'chatsent': function(msg, user) {
-      console.log('received chatsent: msg = ' + msg);
-      user.getRoom().messageMembers('chat', { username: user.name, text: msg });
-    }
-  }
-});
+cloakConfig.messages[common.ROOM_CREATE] = function(msg, user) {
+  var room = cloak.createRoom('butts', 5);
+
+  room.addMember(user);
+}
+
+cloakConfig.messages[common.ROOM_CHAT_SENT] = function(msg, user) {
+  console.log('received chatsent: msg = ' + msg);
+  user.getRoom().messageMembers('chat', { username: user.name, text: msg });
+};
 
 server.listen(8080);
+
+cloak.configure(cloakConfig);
 cloak.run();
