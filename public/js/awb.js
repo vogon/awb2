@@ -34,4 +34,4 @@ cloakConfig.messages[common.ROOM_OTHER_ENTERED] = function (msg, user) {
 };
 
 cloak.configure(cloakConfig);
-cloak.run('http://localhost:8080');
+cloak.run('/');
