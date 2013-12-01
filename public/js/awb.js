@@ -1,4 +1,12 @@
-﻿$('#chat-form').submit(function (e) {
+﻿function compileTemplateFromSelector(selector) {
+  var source = $(selector).html();
+
+  return Handlebars.compile(source);
+}
+
+var chatlogLineTemplate = compileTemplateFromSelector('#chatlog-line-template');
+
+$('#chat-form').submit(function (e) {
   var chatLine = $('#chat-line');
 
   cloak.message('chatsent', chatLine.val());
@@ -10,7 +18,7 @@
 cloak.configure({
   messages: {
     'chat': function (msg, user) {
-      $('#chat-log').append(msg.user + ' says \'' + msg.msg + '\'<br>');
+      $('#chat-log').append(chatlogLineTemplate(msg));
     }
   }
 });

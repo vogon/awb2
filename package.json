@@ -11,6 +11,9 @@
     "cloak": "~0.2.0",
     "underscore": "~1.5.2",
     "express": "~3.4.5",
-    "node-uuid": "~1.4.1"
+    "node-uuid": "~1.4.1",
+    "handlebars": "~1.1.2",
+    "less": "~1.5.1",
+    "express-less": "0.0.2"
   }
 }

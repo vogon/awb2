@@ -32,11 +32,13 @@
     <Compile Include="app.js" />
     <Compile Include="game.js" />
     <Compile Include="public\js\awb.js" />
+    <Content Include="less\main.less" />
     <Content Include="package.json" />
     <Content Include="public\index.html" />
     <Content Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="less\" />
     <Folder Include="public\" />
     <Folder Include="public\js\" />
   </ItemGroup>

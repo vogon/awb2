@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>awb test</title>
+
+    <link rel="stylesheet" href="/less/main.css"/>
 </head>
 <body>
     <div id="chat-log">
@@ -14,10 +16,18 @@
         <input type="submit"/>
     </form>
 
+    <script id="chatlog-line-template" type="text/x-handlebars-template">
+        <div class="chatlog-line">
+            <span class="username">{{username}}</span>
+            <span class="text">{{text}}</span>
+        </div>
+    </script>
+
     <script src="//code.jquery.com/jquery-2.0.3.min.js"></script>
     <script src="/lib/underscore.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/lib/cloak-client.js"></script>
+    <script src="/lib/handlebars.js"></script>
     <script src="/js/awb.js"></script>
 </body>
 </html>

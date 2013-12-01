@@ -1,7 +1,8 @@
 var express = require('express'),
     app = express(),
     server = require('http').createServer(app),
-    cloak = require('cloak');
+    cloak = require('cloak'),
+    expressLess = require('express-less');
 
 var Game = require('./game.js');
 
@@ -23,18 +24,22 @@ app.serveClientLibrary = function (serverPath, library, minifiedRel, unminifiedR
   }
 
   this.get(serverPath, function (req, res) {
-    res.sendfile(path.dirname(require.resolve(library)) + relativePath);
+    res.sendfile(path.normalize(path.dirname(require.resolve(library)) + relativePath));
   });
 };
 
 app.use(express.logger());
 app.use(express.static(__dirname + '/public'));
+// TODO: express-less doesn't seem to cache compiled LESS files -- make sure there's no terrible performance
+// implications for using it
+app.use('/less', expressLess(__dirname + '/less'));
 
 app.get('/', function (req, res) {
   res.redirect('/index.html');
 });
 app.serveClientLibrary('/lib/underscore.js', 'underscore', '/underscore-min.js', '/underscore.js');
 app.serveClientLibrary('/lib/cloak-client.js', 'cloak', '/cloak-client.min.js', '/cloak-client.js');
+app.serveClientLibrary('/lib/handlebars.js', 'handlebars', '/../dist/handlebars.min.js', '/../dist/handlebars.js');
 
 cloak.configure({
   express: server,
@@ -65,7 +70,7 @@ cloak.configure({
 
     'chatsent': function(msg, user) {
       console.log('received chatsent: msg = ' + msg);
-      user.getRoom().messageMembers('chat', { user: user.name, msg: msg });
+      user.getRoom().messageMembers('chat', { username: user.name, text: msg });
     }
   }
 });
