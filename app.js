@@ -93,7 +93,9 @@ cloakConfig.messages[common.ROOM_SEND_CHAT] = function(msg, user) {
   user.getRoom().messageMembers(common.ROOM_CHAT_RECEIVED, { username: user.name, text: msg });
 };
 
-server.listen(80);
+var port = process.env['PORT'] || 80;
+
+server.listen(port);
 
 cloak.configure(cloakConfig);
 cloak.run();

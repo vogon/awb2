@@ -35,6 +35,7 @@
     <Compile Include="public\js\common.js" />
     <Content Include="less\main.less" />
     <Content Include="package.json" />
+    <Content Include="Procfile" />
     <Content Include="public\index.html" />
     <Content Include="README.md" />
   </ItemGroup>
