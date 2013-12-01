@@ -46,6 +46,8 @@ var Game = require('./game.js');
 function notifyRoomUserEntered(room, user) {
   user.message(common.ROOM_YOU_ENTERED, { roomname: room.name });
 
+  // send other-entered message to everyone except the person joining
+  // future cloak pull request: room.messageMembersExcept()
   _(room.members).forEach(function (member) {
     if (user != member) {
       member.message(common.ROOM_OTHER_ENTERED, { roomname: room.name, username: user.name });
@@ -58,6 +60,7 @@ var cloakConfig = {
   autoJoinLobby: true,
   autoCreateRooms: false,
   minRoomMembers: 1,
+
   lobby: {
     newMember: function(user) {
       console.log('lobby newMember');

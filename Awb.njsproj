@@ -30,6 +30,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
+    <Compile Include="cardset.js" />
     <Compile Include="game.js" />
     <Compile Include="public\js\awb.js" />
     <Compile Include="public\js\common.js" />
@@ -38,11 +39,13 @@
     <Content Include="Procfile" />
     <Content Include="public\index.html" />
     <Content Include="README.md" />
+    <Content Include="sets\cah-cc-by-nc-sa.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="less\" />
     <Folder Include="public\" />
     <Folder Include="public\js\" />
+    <Folder Include="sets\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
   <ProjectExtensions>
