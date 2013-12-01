@@ -16,10 +16,21 @@
         <input type="submit"/>
     </form>
 
-    <script id="chatlog-line-template" type="text/x-handlebars-template">
+    <script id="chatlog-msg-template" type="text/x-handlebars-template">
         <div class="chatlog-line">
-            <span class="username">{{username}}</span>
-            <span class="text">{{text}}</span>
+            <span class="username">{{username}}</span> {{text}}
+        </div>
+    </script>
+
+    <script id="chatlog-youjoined-template" type="text/x-handlebars-template">
+        <div class="chatlog-line">
+            You joined room &quot;<span class="roomname">{{roomname}}</span>&quot;.
+        </div>
+    </script>
+
+    <script id="chatlog-otherjoined-template" type="text/x-handlebars-template">
+        <div class="chatlog-line">
+            <span class="username">{{username}}</span> joined room &quot;<span class="roomname">{{roomname}}</span>&quot;.
         </div>
     </script>
 

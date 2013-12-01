@@ -1,11 +1,10 @@
-var express = require('express'),
+var _ = require('underscore'),
+    express = require('express'),
     app = express(),
     server = require('http').createServer(app),
     cloak = require('cloak'),
     expressLess = require('express-less');
-
-var Game = require('./game.js');
-
+    
 var preferMinify = true;
 
 app.serveClientLibrary = function (serverPath, library, minifiedRel, unminifiedRel) {
@@ -42,6 +41,17 @@ app.serveClientLibrary('/lib/cloak-client.js', 'cloak', '/cloak-client.min.js', 
 app.serveClientLibrary('/lib/handlebars.js', 'handlebars', '/../dist/handlebars.min.js', '/../dist/handlebars.js');
 
 var common = require('./public/js/common.js');
+var Game = require('./game.js');
+
+function notifyRoomUserEntered(room, user) {
+  user.message(common.ROOM_YOU_ENTERED, { roomname: room.name });
+
+  _(room.members).forEach(function (member) {
+    if (user != member) {
+      member.message(common.ROOM_OTHER_ENTERED, { roomname: room.name, username: user.name });
+    }
+  });
+}
 
 var cloakConfig = {
   express: server,
@@ -49,7 +59,11 @@ var cloakConfig = {
   autoCreateRooms: false,
   minRoomMembers: 1,
   lobby: {
+    newMember: function(user) {
+      console.log('lobby newMember');
 
+      notifyRoomUserEntered(cloak.getLobby(), user);
+    }
   },
 
   room: {
@@ -59,7 +73,9 @@ var cloakConfig = {
     },
 
     newMember: function(user) {
-      user.message('joinedroom', { room: user.getRoom().data });
+      console.log('room newMember');
+
+      notifyRoomUserEntered(user.getRoom(), user);
     }
   },
 
@@ -72,9 +88,9 @@ cloakConfig.messages[common.ROOM_CREATE] = function(msg, user) {
   room.addMember(user);
 }
 
-cloakConfig.messages[common.ROOM_CHAT_SENT] = function(msg, user) {
+cloakConfig.messages[common.ROOM_SEND_CHAT] = function(msg, user) {
   console.log('received chatsent: msg = ' + msg);
-  user.getRoom().messageMembers('chat', { username: user.name, text: msg });
+  user.getRoom().messageMembers(common.ROOM_CHAT_RECEIVED, { username: user.name, text: msg });
 };
 
 server.listen(8080);
