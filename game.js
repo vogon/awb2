@@ -30,7 +30,7 @@ module.exports = (function () {
   }
 
   Game.prototype.changeSize = function (newSize) {
-    if (this._activePlayers().size() > newSize) {
+    if (_(this._activePlayers()).size() > newSize) {
       // game would be too small after resizing
       return false;
     } else {
@@ -41,7 +41,7 @@ module.exports = (function () {
   }
 
   Game.prototype.join = function (user) {
-    if (this._activePlayers().size() >= this._n) {
+    if (_(this._activePlayers()).size() >= this._n) {
       // game's already full
       return false;
     } else {
@@ -69,6 +69,18 @@ module.exports = (function () {
     }
   }
 
+  Game.prototype.answer = function (user, answer) {
+    return false;
+  }
+
+  Game.prototype.vote = function (user, answer) {
+    return false;
+  }
+
+  Game.prototype.newRound = function () {
+    return false;
+  }
+
   Game.prototype._makePlayer = function (user) {
     return {
       user: user,
@@ -76,7 +88,7 @@ module.exports = (function () {
       score: 0,
       hand: []
     };
-  };
+  }
 
   Game.prototype._readyToStart = function () {
     return (this._status == Status.NOT_STARTED) && this._activePlayers().size() >= 3;
@@ -93,7 +105,7 @@ module.exports = (function () {
     }
 
     return this._blackCardDeck.shift();
-  };
+  }
 
   Game.prototype._dealWhiteCards = function (n) {
     if (_(this._whiteCardDeck).size() < n) {
@@ -106,7 +118,7 @@ module.exports = (function () {
     this._whiteCardDeck = remainder;
 
     return dealt;
-  };
+  }
 
   Game.prototype._startRound = function () {
     if (this._status != Status.WAIT_FOR_NEXT_ROUND) {
@@ -126,7 +138,7 @@ module.exports = (function () {
 
     // reset list of answers
     this.currentWhiteCards = [];
-  };
+  }
 
   Game.prototype._endRound = function () {
     if (this._status != Status.WAIT_FOR_ROUND_END) {
@@ -134,20 +146,7 @@ module.exports = (function () {
     }
 
     // record this round in the game history
-  };
-
-  Game.prototype.start = function () {
-    if (!this._readyToStart()) {
-      return false;
-    }
-
-    // give everyone an empty hand
-    for (var i = 0; i < _(this.players).size(); i++) {
-      this.hands[i] = [];
-    }
-
-    this._status = Status.WAITING_FOR_NEXT_ROUND;
-  };
+  }
 
   return Game;
 })();

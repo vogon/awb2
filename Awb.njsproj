@@ -34,6 +34,8 @@
     <Compile Include="game.js" />
     <Compile Include="public\js\awb.js" />
     <Compile Include="public\js\common.js" />
+    <Compile Include="test\all.js" />
+    <Compile Include="test\test-game.js" />
     <Content Include="less\main.less" />
     <Content Include="package.json" />
     <Content Include="Procfile" />
@@ -46,6 +48,7 @@
     <Folder Include="public\" />
     <Folder Include="public\js\" />
     <Folder Include="sets\" />
+    <Folder Include="test\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
   <ProjectExtensions>
