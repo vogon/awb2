@@ -1,5 +1,15 @@
 ﻿var Game = require('../game.js');
 
+// statuses stolen from game.js
+var Status = {
+  NOT_STARTED: 0,
+  WAIT_FOR_ROUND_START: 1,
+  WAIT_FOR_ANSWERS: 2,
+  WAIT_FOR_JUDGMENT: 3,
+  WAIT_FOR_ROUND_END: 4,
+  GAME_OVER: 5
+};
+
 // game verbs: join, leave, answer (a black card), vote (for a white card), new round
 // game states: pre-start, awaiting answers, awaiting vote, awaiting new round, finished
 
@@ -88,6 +98,7 @@ exports['pre-start functional'] = {
     test.ok(this.game.join(0));
     test.ok(this.game.join(1));
     test.ok(!this.game.newRound());
+    test.equal(this.game._getState(), Status.NOT_STARTED);
     test.done();
   },
   'new round succeeds': function (test) {
@@ -95,6 +106,7 @@ exports['pre-start functional'] = {
     test.ok(this.game.join(1));
     test.ok(this.game.join(2));
     test.ok(this.game.newRound());
+    test.equal(this.game._getState(), Status.WAIT_FOR_ANSWERS);
     test.done();
   }
 };
@@ -120,6 +132,25 @@ exports['awaiting answers functional'] = {
   tearDown: function (callback) {
     callback();
   },
+  "join works, newly-joined player can answer": function (test) {
+    test.ok(this.game.changeSize(4));
+    test.ok(this.game.join(3));
+
+    var player = this.game.getPlayer(3);
+    test.ok(this.game.answer(3, player.hand[0]));
+    
+    test.done();
+  },
+  'card czar leave works, round is abandoned': function (test) {
+    test.ok(this.game.leave(0));
+    test.equal(this.game._getState(), Status.WAIT_FOR_ROUND_START);
+    test.done();
+  },
+  'non-card czar leave works': function (test) {
+    test.ok(this.game.leave(1));
+    test.equal(this.game._getState(), Status.WAIT_FOR_ANSWERS);
+    test.done();
+  },
   'vote fails': function (test) {
     test.ok(!this.game.vote());
     test.done();
@@ -140,6 +171,9 @@ exports['awaiting answers functional'] = {
 //     if a player has won, state transition to finished;
 //     otherwise, state transition to awaiting new round
 //   new round fails
+exports['awaiting vote functional'] = {
+
+};
 
 // awaiting new round:
 //   join works - player can become next card czar and answer in next round
@@ -147,6 +181,9 @@ exports['awaiting answers functional'] = {
 //   answer fails
 //   vote fails
 //   new round works iff there are >= 3 players, state transition to awaiting answers
+exports['awaiting new round functional'] = {
+
+};
 
 // finished:
 //   join fails
@@ -154,3 +191,6 @@ exports['awaiting answers functional'] = {
 //   answer fails
 //   vote fails
 //   new round fails
+exports['finished functional'] = {
+
+};

@@ -1,38 +1,59 @@
-﻿var fs = require('fs'),
+﻿var crypto = require('crypto'),
+    fs = require('fs'),
     _ = require('underscore');
 
-function normalizeWhiteCard(obj) {
-  // if obj is a string:
-  //   inline form = obj
-  //   generate card form:
-  //     sentence-case
-  //     add period to the end
-  // else:
-  //   return obj
+function makeWhiteCardId(setId, index, inline) {
+  return setId + ':w:' + index;
+}
 
-  if (typeof obj.valueOf() == 'string') {
-    var result = {};
+function normalizeWhiteCard(setId, index, obj) {
+  var result = null;
 
-    result.inline = obj;
-    
+  if (_(obj).isString()) {
+    result = { inline: obj };
+  } else {
+    result = obj;
+  }
+
+  // if we don't have a unique id, generate one
+  if (!result.id) {
+    result.id = makeWhiteCardId(setId, index, obj.inline);
+  }
+
+  // if we don't have a "card form", generate it from the inline form; sentence-case, add final period
+  if (!result.card) {
     var card = obj;
     card = card[0].toUpperCase() + card.substr(1);
     card += '.';
 
     result.card = card;
-
-    return result;
-  } else {
-    return obj;
   }
+
+  return result;
 }
 
-function normalizeBlackCard(obj) {
+function makeBlackCardId(setId, index, card) {
+  return setId + ':k:' + index;
+}
+
+function normalizeBlackCard(setId, index, obj) {
   // TODO: replace _+ with something that we turn into a pretty underline/drag target on the client
 
-  var result = {};
+  var result = null;
 
-  if (typeof obj.valueOf() == 'string') {
+  if (_(obj).isString()) {
+    result = { card: obj };
+  } else {
+    result = obj;
+  }
+
+  // if we don't have a unique id, generate one
+  if (!result.id) {
+    result.id = makeBlackCardId(setId, index, obj.card);
+  }
+  
+  // if we don't have a "finished form", generate it from the card form; replace blanks with white-card insertion points
+  if (!result.finished) {
     var index = 0;
     var previous;
     var finished = obj;
@@ -53,10 +74,7 @@ function normalizeBlackCard(obj) {
       result.arity = index;
     }
 
-    result.card = obj;
     result.finished = finished;
-  } else {
-    result = obj;
   }
 
   return result;
@@ -64,7 +82,7 @@ function normalizeBlackCard(obj) {
 
 module.exports = (function () {
   function Cardset(path) {
-    var json = fs.readFileSync(path, { encoding: "utf8" }),
+    var json = fs.readFileSync(path, { encoding: 'utf8' }),
         o = JSON.parse(json);
 
     this.name = o['name'];
@@ -73,8 +91,18 @@ module.exports = (function () {
 
     this.locale = o['lang'];
 
-    this.blackCards = _(o['black_cards']).map(normalizeBlackCard);
-    this.whiteCards = _(o['white_cards']).map(normalizeWhiteCard);
+    var setKey = this.name + '|' + this.description;
+    var shasum = crypto.createHash('sha1');
+    shasum.update(setKey, 'utf8');
+
+    var setId = shasum.digest('hex');
+
+    this.blackCards = _(o['black_cards']).map(function (card, index, list) {
+      return normalizeBlackCard(setId, index, card);
+    });
+    this.whiteCards = _(o['white_cards']).map(function (card, index, list) {
+      return normalizeWhiteCard(setId, index, card);
+    });
   }
 
   return Cardset;

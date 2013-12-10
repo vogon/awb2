@@ -20,11 +20,17 @@ module.exports = (function () {
     this.id = uuid.v4();
     this.name = 'game ' + Math.floor(Math.random() * 1000000);
     this.players = [];
-    this._status = Status.NOT_STARTED;
+    this._state = Status.NOT_STARTED;
+
     this._whiteCards = cah.whiteCards;
     this._blackCards = cah.blackCards;
+    
     this._whiteCardDeck = [];
     this._blackCardDeck = [];
+    
+    this._currentBlackCard = null;
+    this._currentAnswers = null;
+    
     this._rounds = [];
     this._n = 4;
   }
@@ -51,13 +57,24 @@ module.exports = (function () {
       }
 
       // everything's cool
-      this.players.push(this._makePlayer(user));
+      var player = this._makePlayer(user);
+      this.players.push(player);
+
+      // if we're currently waiting for answers, deal the player in
+      if (this._getState() == Status.WAIT_FOR_ANSWERS) {
+        this._dealToPlayer(player);
+      }
+
       return true;
     }
   }
 
+  Game.prototype.getPlayer = function (user) {
+    return _(this.players).findWhere({ user: user });
+  }
+
   Game.prototype.leave = function (user) {
-    var player = _(this.players).findWhere({ user: user });
+    var player = this.getPlayer(user);
 
     if (!player) {
       // user actually isn't in this game?
@@ -70,6 +87,29 @@ module.exports = (function () {
   }
 
   Game.prototype.answer = function (user, answer) {
+    var player = this.getPlayer(user);
+
+    if (!player) {
+      // user isn't in this game
+      return false;
+    } else {
+      // find the card in the user's hand
+      var card = _(player.hand).findWhere({ id: answer.id });
+
+      if (card) {
+        // player has card, so play it
+        player.hand = _(player.hand).without(card);
+        this.currentAnswers[player.id] = card;
+
+        return true;
+      } else {
+        // player doesn't have card
+        return false;
+      }
+    }
+  }
+
+  Game.prototype.lockAnswers = function (user) {
     return false;
   }
 
@@ -78,7 +118,36 @@ module.exports = (function () {
   }
 
   Game.prototype.newRound = function () {
+    if (this._state != Status.NOT_STARTED && this._state != Status.WAIT_FOR_ROUND_START) {
+      // can't start a new round right now
+      return false;
+    }
+
+    if (_(this._activePlayers()).size() < 3) {
+      // not enough players to start a round
+      return false;
+    }
+
+    var g = this;
+
+    // deal a new round
+    _(this.players).forEach(this._dealToPlayer.bind(this));
+
+    this._currentBlackCard = this._dealBlackCard();
+    this._currentAnswers = {};
+
+    // change state to awaiting answers
+    this._state = Status.WAIT_FOR_ANSWERS;
+
+    return true;
+  }
+
+  Game.prototype._setNextCardCzar = function (player) {
     return false;
+  }
+
+  Game.prototype._getState = function() {
+    return this._state;
   }
 
   Game.prototype._makePlayer = function (user) {
@@ -88,10 +157,6 @@ module.exports = (function () {
       score: 0,
       hand: []
     };
-  }
-
-  Game.prototype._readyToStart = function () {
-    return (this._status == Status.NOT_STARTED) && this._activePlayers().size() >= 3;
   }
 
   Game.prototype._activePlayers = function () {
@@ -120,32 +185,11 @@ module.exports = (function () {
     return dealt;
   }
 
-  Game.prototype._startRound = function () {
-    if (this._status != Status.WAIT_FOR_NEXT_ROUND) {
-      // we're already in a round.
-      return false;
-    }
+  Game.prototype._dealToPlayer = function(player) {
+    var oldHandSize = _(player.hand).size();
+    var newCards = this._dealWhiteCards(10 - oldHandSize);
 
-    // deal people up to 10
-    _(this.hands).forEach(function (hand, index) {
-      var toDeal = 10 - _(hand).size();
-
-      this.hands[index] = hand.concat(this._dealWhiteCards(toDeal));
-    });
-
-    // choose a new black card
-    this.currentBlackCard = this._dealBlackCard();
-
-    // reset list of answers
-    this.currentWhiteCards = [];
-  }
-
-  Game.prototype._endRound = function () {
-    if (this._status != Status.WAIT_FOR_ROUND_END) {
-      // we're not ready for this round to end yet.
-    }
-
-    // record this round in the game history
+    player.hand = player.hand.concat(newCards);
   }
 
   return Game;
