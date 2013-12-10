@@ -155,6 +155,25 @@ exports['awaiting answers functional'] = {
     test.equal(this.game._getState(), Status.WAIT_FOR_ANSWERS);
     test.done();
   },
+  'answer fails for card czar': function (test) {
+    var cardCzar = this.game._getCardCzar();
+
+    test.ok(!this.game.answer(cardCzar.user, cardCzar.hand[0]));
+    test.done();
+  },
+  'answer only works once': function (test) {
+    var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+
+    test.ok(this.game.answer(notCardCzarPlayer.user, notCardCzarPlayer.hand[0]));
+    test.ok(!this.game.answer(notCardCzarPlayer.user, notCardCzarPlayer.hand[0]));
+    test.done();
+  },
+  'answer works': function (test) {
+    var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+    
+    test.ok(this.game.answer(notCardCzarPlayer.user, notCardCzarPlayer.hand[0]));
+    test.done();
+  },
   'vote fails': function (test) {
     test.ok(!this.game.vote());
     test.done();

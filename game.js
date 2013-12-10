@@ -88,7 +88,7 @@ module.exports = (function () {
       return false;
     } else {
       // if the player is the current card czar, then abandon the current round
-      if (this._currentCardCzar && player.id == this._currentCardCzar.id) {
+      if (player == this._currentCardCzar) {
         this._state = Status.WAIT_FOR_ROUND_START;
       }
 
@@ -105,10 +105,18 @@ module.exports = (function () {
       // user isn't in this game
       return false;
     } else {
+      // card czar can't answer
+      if (player == this._currentCardCzar) {
+        return false;
+      }
+
       // find the card in the user's hand
       var card = _(player.hand).findWhere({ id: answer.id });
 
-      if (card) {
+      if (this._currentAnswers[player.id]) {
+        // player has already answered
+        return false;
+      } else if (card) {
         // player has card, so play it
         player.hand = _(player.hand).without(card);
         this._currentAnswers[player.id] = card;
