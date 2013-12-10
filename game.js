@@ -19,7 +19,10 @@ module.exports = (function () {
   function Game() {
     this.id = uuid.v4();
     this.name = 'game ' + Math.floor(Math.random() * 1000000);
+
     this.players = [];
+    this._nextPlayerId = 1;
+
     this._state = Status.NOT_STARTED;
 
     this._whiteCards = cah.whiteCards;
@@ -28,10 +31,10 @@ module.exports = (function () {
     this._whiteCardDeck = [];
     this._blackCardDeck = [];
     
+    this._currentCardCzar = null;
     this._currentBlackCard = null;
     this._currentAnswers = null;
-    
-    this._rounds = [];
+
     this._n = 4;
   }
 
@@ -69,17 +72,26 @@ module.exports = (function () {
     }
   }
 
-  Game.prototype.getPlayer = function (user) {
+  Game.prototype._getPlayer = function (user) {
     return _(this.players).findWhere({ user: user });
   }
 
+  Game.prototype._getCardCzar = function () {
+    return this._currentCardCzar;
+  }
+
   Game.prototype.leave = function (user) {
-    var player = this.getPlayer(user);
+    var player = this._getPlayer(user);
 
     if (!player) {
       // user actually isn't in this game?
       return false;
     } else {
+      // if the player is the current card czar, then abandon the current round
+      if (this._currentCardCzar && player.id == this._currentCardCzar.id) {
+        this._state = Status.WAIT_FOR_ROUND_START;
+      }
+
       // everything's cool
       player.hasLeft = true;
       return true;
@@ -87,7 +99,7 @@ module.exports = (function () {
   }
 
   Game.prototype.answer = function (user, answer) {
-    var player = this.getPlayer(user);
+    var player = this._getPlayer(user);
 
     if (!player) {
       // user isn't in this game
@@ -99,7 +111,7 @@ module.exports = (function () {
       if (card) {
         // player has card, so play it
         player.hand = _(player.hand).without(card);
-        this.currentAnswers[player.id] = card;
+        this._currentAnswers[player.id] = card;
 
         return true;
       } else {
@@ -136,6 +148,25 @@ module.exports = (function () {
     this._currentBlackCard = this._dealBlackCard();
     this._currentAnswers = {};
 
+    // select new card czar
+    if (this._currentCardCzar) {
+      // already had a card czar, select next-by-id active player
+      var cardCzar = this._currentCardCzar;
+      var players = _(this._activePlayers()).sortBy(function (player) { return player.id; });
+      var nextPlayer = _(players).find(function (player) { return player.id > cardCzar.id; });
+
+      if (nextPlayer) {
+        this._currentCardCzar = nextPlayer;
+      } else {
+        // no players with a higher id than the current card czar; start again at the beginning
+        this._currentCardCzar = players[0];
+      }
+    } else {
+      // no card czar yet, choose an active player randomly
+      var players = _(this._activePlayers()).shuffle();
+      this._currentCardCzar = players[0];
+    }
+
     // change state to awaiting answers
     this._state = Status.WAIT_FOR_ANSWERS;
 
@@ -152,6 +183,7 @@ module.exports = (function () {
 
   Game.prototype._makePlayer = function (user) {
     return {
+      id: this._nextPlayerId++,
       user: user,
       hasLeft: false,
       score: 0,

@@ -136,18 +136,22 @@ exports['awaiting answers functional'] = {
     test.ok(this.game.changeSize(4));
     test.ok(this.game.join(3));
 
-    var player = this.game.getPlayer(3);
+    var player = this.game._getPlayer(3);
     test.ok(this.game.answer(3, player.hand[0]));
     
     test.done();
   },
   'card czar leave works, round is abandoned': function (test) {
-    test.ok(this.game.leave(0));
+    var cardCzar = this.game._getCardCzar();
+
+    test.ok(this.game.leave(cardCzar.user));
     test.equal(this.game._getState(), Status.WAIT_FOR_ROUND_START);
     test.done();
   },
   'non-card czar leave works': function (test) {
-    test.ok(this.game.leave(1));
+    var notCardCzarUser = (this.game._getCardCzar().user == 0) ? 1 : 0;
+
+    test.ok(this.game.leave(notCardCzarUser));
     test.equal(this.game._getState(), Status.WAIT_FOR_ANSWERS);
     test.done();
   },
