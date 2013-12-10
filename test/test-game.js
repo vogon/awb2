@@ -10,7 +10,7 @@ var Status = {
   GAME_OVER: 5
 };
 
-// game verbs: join, leave, answer (a black card), vote (for a white card), new round
+// game verbs: join, leave, answer (a black card), lock answers, vote (for a white card), new round
 // game states: pre-start, awaiting answers, awaiting vote, awaiting new round, finished
 
 // --- state-independent behaviors ---
@@ -67,6 +67,7 @@ exports['leave'] = {
 //   join works
 //   leave works
 //   answer fails
+//   lock answers fails
 //   vote fails
 //   new round works iff there are >= 3 players, state transition to awaiting answers
 exports['pre-start functional'] = {
@@ -84,6 +85,10 @@ exports['pre-start functional'] = {
   'leave succeeds': function (test) {
     test.ok(this.game.join(0));
     test.ok(this.game.leave(0));
+    test.done();
+  },
+  'lock answers fails': function (test) {
+    test.ok(!this.game.lockAnswers());
     test.done();
   },
   'answer fails': function (test) {
@@ -117,6 +122,7 @@ exports['pre-start functional'] = {
 //     if player is card czar, round is discarded;
 //     behavior if player count is now < 3 tbd
 //   answer works iff the answering player isn't the card czar and hasn't answered
+//   lock answers works iff all active players have answered
 //   vote fails
 //   new round fails
 exports['awaiting answers functional'] = {
@@ -190,6 +196,7 @@ exports['awaiting answers functional'] = {
 //     if player is card czar, round is discarded;
 //     behavior if player count is now < 3 tbd
 //   answer fails
+//   lock answers fails
 //   vote works iff the voting player is the card czar;
 //     if a player has won, state transition to finished;
 //     otherwise, state transition to awaiting new round
@@ -202,6 +209,7 @@ exports['awaiting vote functional'] = {
 //   join works - player can become next card czar and answer in next round
 //   leave works
 //   answer fails
+//   lock answers fails
 //   vote fails
 //   new round works iff there are >= 3 players, state transition to awaiting answers
 exports['awaiting new round functional'] = {
@@ -212,6 +220,7 @@ exports['awaiting new round functional'] = {
 //   join fails
 //   leave works
 //   answer fails
+//   lock answers fails
 //   vote fails
 //   new round fails
 exports['finished functional'] = {
