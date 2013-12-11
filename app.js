@@ -55,6 +55,16 @@ function notifyRoomUserEntered(room, user) {
   });
 }
 
+// placeholder, do something fancier with this
+var games = [];
+
+function makeClientGameView(game) {
+  return {
+    id: game.id,
+    name: game.name
+  };
+}
+
 var cloakConfig = {
   express: server,
   autoJoinLobby: true,
@@ -66,15 +76,13 @@ var cloakConfig = {
       console.log('lobby newMember');
 
       notifyRoomUserEntered(cloak.getLobby(), user);
+
+      var gameList = _(games).map(makeClientGameView);
+      user.message(common.GAME_LIST, { games: gameList });
     }
   },
 
   room: {
-    init: function () {
-      this.data = new Game();
-      this.data.name = this.name;
-    },
-
     newMember: function(user) {
       console.log('room newMember');
 
@@ -85,11 +93,17 @@ var cloakConfig = {
   messages: {}
 };
 
-cloakConfig.messages[common.ROOM_CREATE] = function (msg, user) {
-  var room = cloak.createRoom('butts', 5);
+cloakConfig.messages[common.CREATE_GAME] = function (msg, user) {
+  var game = new Game();
+  var room = cloak.createRoom(game.name, 4);
 
-  room.addMember(user);
-}
+  room.data = game;
+  games.push(game);
+  user.joinRoom(room);
+  
+  var gameList = _(games).map(makeClientGameView);
+  user.message(common.GAME_LIST, { games: gameList });
+};
 
 cloakConfig.messages[common.ROOM_SEND_CHAT] = function (msg, user) {
   console.log('received chatsent: msg = ' + msg);

@@ -6,20 +6,35 @@
     <link rel="stylesheet" href="/less/main.css"/>
 </head>
 <body>
-    <form id="change-name-form">
-        <input id="new-name" type="text"/>
-        <input type="submit" value="change name"/>
-    </form>
+    <ul id="game-list">
+    </ul>
 
-    <div id="chat-log">
-        hey there what's goin on
-        <br />
+    <div id="game-content">
+        <form id="change-name-form">
+            <input id="new-name" type="text" />
+            <input type="submit" value="change name" />
+        </form>
+
+        <div id="chat-log">
+            hey there what's goin on
+            <br />
+        </div>
+
+        <form id="chat-form">
+            <input id="chat-line" type="text" />
+            <input type="submit" value="send" />
+        </form>
     </div>
 
-    <form id="chat-form">
-        <input id="chat-line" type="text"/>
-        <input type="submit" value="send"/>
-    </form>
+    <script id="game-list-template" type="text/x-handlebars-template">
+        {{#each games}}
+        <li class="game">
+            <p class="name">{{name}}</p>
+            <p></p>
+        </li>
+        {{/each}}
+        <li class="create-game">+ create a new game</li>
+    </script>
 
     <script id="chatlog-msg-template" type="text/x-handlebars-template">
         <div class="chatlog-line">

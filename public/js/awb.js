@@ -4,12 +4,13 @@
   return Handlebars.compile(source);
 }
 
-var chatlogMsgTemplate = compileTemplateFromSelector('#chatlog-msg-template'),
+var gameListTemplate = compileTemplateFromSelector('#game-list-template'),
+    chatlogMsgTemplate = compileTemplateFromSelector('#chatlog-msg-template'),
     chatlogYouJoinedTemplate = compileTemplateFromSelector('#chatlog-youjoined-template'),
     chatlogOtherJoinedTemplate = compileTemplateFromSelector('#chatlog-otherjoined-template'),
     chatlogYouNickTemplate = compileTemplateFromSelector('#chatlog-younick-template'),
     chatlogOtherNickTemplate = compileTemplateFromSelector('#chatlog-othernick-template');
-
+    
 $('#chat-form').submit(function (e) {
   var chatLine = $('#chat-line');
 
@@ -50,6 +51,14 @@ cloakConfig.messages[common.YOU_CHANGED_NAME] = function (msg, user) {
 
 cloakConfig.messages[common.OTHER_CHANGED_NAME] = function (msg, user) {
   $('#chat-log').append(chatlogOtherNickTemplate(msg));
+}
+
+cloakConfig.messages[common.GAME_LIST] = function (msg, user) {
+  $('#game-list').html(gameListTemplate(msg));
+
+  $('.create-game').click(function (e) {
+    cloak.message(common.CREATE_GAME);
+  });
 }
 
 cloak.configure(cloakConfig);
