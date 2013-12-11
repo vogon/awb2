@@ -181,6 +181,13 @@ exports['awaiting answers'] = {
     test.ok(!this.game.answer(cardCzar.user, cardCzar.hand[0]));
     test.done();
   },
+  "answer fails for card not in player's hand": function (test) {
+    var cardCzar = this.game._getCardCzar();
+    var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+
+    test.ok(!this.game.answer(notCardCzarPlayer.user, cardCzar.hand[0]));
+    test.done();
+  },
   'answer works': function (test) {
     var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
     
@@ -308,6 +315,12 @@ exports['awaiting vote'] = {
     var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
 
     test.ok(!this.game.vote(notCardCzarPlayer.user, this.game._currentAnswers[notCardCzarPlayer.id]));
+    test.done();
+  },
+  "vote fails for an answer that hasn't been provided": function (test) {
+    var cardCzar = this.game._getCardCzar();
+    
+    test.ok(!this.game.vote(cardCzar.user, cardCzar.hand[0]));
     test.done();
   },
   'vote works, transition to finished if someone won': function (test) {

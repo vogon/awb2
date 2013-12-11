@@ -21,9 +21,11 @@ module.exports = (function () {
     this.name = 'game ' + Math.floor(Math.random() * 1000000);
 
     this.players = [];
+    this.winner = null;
+
     this._nextPlayerId = 1;
 
-    this._winFn = function (player) {
+    this._winFn = function (player, otherPlayers) {
       return player.score >= 3;
     }
 
@@ -164,8 +166,53 @@ module.exports = (function () {
     }
   }
 
-  Game.prototype.vote = function (user, answer) {
-    return false;
+  Game.prototype.vote = function (user, chosenAnswer) {
+    if (this._state != Status.WAIT_FOR_JUDGMENT) {
+      // not waiting for vote right now
+      return false;
+    } else if (user != this._currentCardCzar.user) {
+      // only the card czar can vote
+      return false;
+    } else {
+      var g = this, answerFound = false;
+
+      // find the actual answer, and the person who submitted it
+      _(this._currentAnswers).each(function (answer, answererId, answers) {
+        if (chosenAnswer.id == answer.id) {
+          var answerer = _(g.players).findWhere({ id: Number(answererId) });
+
+          answerer.score += 1;
+          answerFound = true;
+        }
+      });
+
+      if (!answerFound) {
+        return false;
+      }
+
+      // check for win state and move to new state
+      var gameOver = false, winner = null;
+      var g = this;
+
+      _(this.players).each(function (player) {
+        var otherPlayers = _(g.players).without(player);
+
+        if (g._winFn(player, otherPlayers)) {
+          gameOver = true;
+          winner = player;
+        }
+      });
+
+      if (gameOver) {
+        this.winner = winner;
+        this._state = Status.GAME_OVER;
+      } else {
+        this._state = Status.WAIT_FOR_ROUND_START;
+      }
+
+      // everything's cool
+      return true;
+    }
   }
 
   Game.prototype.newRound = function () {
