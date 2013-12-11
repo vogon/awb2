@@ -56,7 +56,7 @@ module.exports = (function () {
   }
 
   Game.prototype.join = function (user) {
-    if (this._state == Status.FINISHED) {
+    if (this._state == Status.GAME_OVER) {
       // game's already over
       return false;
     } else if (_(this._activePlayers()).size() >= this._n) {
@@ -264,7 +264,7 @@ module.exports = (function () {
       return false;
     }
 
-    this._state = Status.FINISHED;
+    this._state = Status.GAME_OVER;
     return true;
   }
 

@@ -356,7 +356,65 @@ exports['awaiting vote'] = {
 //   vote fails
 //   new round works iff there are >= 3 players, state transition to awaiting answers
 exports['awaiting new round'] = {
+  setUp: function (callback) {
+    this.game = new Game();
+    this.game.join(0);
+    this.game.join(1);
+    this.game.join(2);
+    this.game.newRound();
 
+    var cardCzar = this.game._getCardCzar();
+
+    answerAll(this.game);
+    this.game.lockAnswers(cardCzar.user);
+
+    var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+    this.game.vote(cardCzar.user, this.game._currentAnswers[notCardCzarPlayer.id]);
+
+    callback();
+  },
+  tearDown: function (callback) {
+    callback();
+  },
+  'join works': function (test) {
+    test.ok(this.game.changeSize(4));
+    test.ok(this.game.join(3));
+    test.done();
+  },
+  'leave works': function (test) {
+    test.ok(this.game.leave(0));
+    test.done();
+  },
+  'answer fails': function (test) {
+    var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+
+    test.ok(!this.game.answer(notCardCzarPlayer.user, notCardCzarPlayer.hand[0]));
+    test.done();
+  },
+  'lock answers fails': function (test) {
+    var cardCzar = this.game._getCardCzar();
+
+    test.ok(!this.game.lockAnswers(cardCzar.user));
+    test.done();
+  },
+  'vote fails': function (test) {
+    var cardCzar = this.game._getCardCzar();
+    var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+
+    test.ok(!this.game.vote(cardCzar.user, this.game._currentAnswers[notCardCzarPlayer.id]));
+    test.done();
+  },
+  'new round fails if too few players': function (test) {
+    test.ok(this.game.leave(0));
+    test.ok(!this.game.newRound());
+    test.equal(this.game._getState(), Status.WAIT_FOR_ROUND_START);
+    test.done();
+  },
+  'new round succeeds': function (test) {
+    test.ok(this.game.newRound());
+    test.equal(this.game._getState(), Status.WAIT_FOR_ANSWERS);
+    test.done();
+  }
 };
 
 // finished:
@@ -372,7 +430,19 @@ exports['finished'] = {
     this.game.join(0);
     this.game.join(1);
     this.game.join(2);
-    this.game._endGame();
+    this.game.newRound();
+
+    var cardCzar = this.game._getCardCzar();
+
+    answerAll(this.game);
+    this.game.lockAnswers(cardCzar.user);
+
+    var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+
+    // set up the player to win
+    notCardCzarPlayer.score = 100000;
+    this.game.vote(cardCzar.user, this.game._currentAnswers[notCardCzarPlayer.id]);
+
     callback();
   },
   'join fails': function (test) {
@@ -392,12 +462,20 @@ exports['finished'] = {
     test.ok(!this.game.answer(player.user, player.hand[0]));
     test.done();
   },
-  //'lock answers fails': function (test) {
+  'lock answers fails': function (test) {    
+    var cardCzar = this.game._getCardCzar();
 
-  //},
-  //'vote fails': function (test) {
-  //  test.done();
-  //},
+    test.ok(!this.game.lockAnswers(cardCzar.user));
+    test.done();
+  },
+  'vote fails': function (test) {
+    var cardCzar = this.game._getCardCzar();
+    var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+
+    test.ok(!this.game.vote(cardCzar.user, this.game._currentAnswers[notCardCzarPlayer.id]));
+
+    test.done();
+  },
   'new round fails': function (test) {
     test.ok(!this.game.newRound());
     test.done();
