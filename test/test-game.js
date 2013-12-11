@@ -122,7 +122,7 @@ exports['pre-start functional'] = {
 //     if player is card czar, round is discarded;
 //     behavior if player count is now < 3 tbd
 //   answer works iff the answering player isn't the card czar and hasn't answered
-//   lock answers works iff all active players have answered
+//   lock answers works iff the locking player is the card czar and all active players have answered
 //   vote fails
 //   new round fails
 exports['awaiting answers functional'] = {
@@ -167,6 +167,12 @@ exports['awaiting answers functional'] = {
     test.ok(!this.game.answer(cardCzar.user, cardCzar.hand[0]));
     test.done();
   },
+  'answer works': function (test) {
+    var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+    
+    test.ok(this.game.answer(notCardCzarPlayer.user, notCardCzarPlayer.hand[0]));
+    test.done();
+  },
   'answer only works once': function (test) {
     var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
 
@@ -174,10 +180,26 @@ exports['awaiting answers functional'] = {
     test.ok(!this.game.answer(notCardCzarPlayer.user, notCardCzarPlayer.hand[0]));
     test.done();
   },
-  'answer works': function (test) {
-    var notCardCzarPlayer = (this.game._getCardCzar().user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
-    
-    test.ok(this.game.answer(notCardCzarPlayer.user, notCardCzarPlayer.hand[0]));
+  "lock answers fails if locking player isn't card czar": function (test) {
+    var cardCzar = this.game._getCardCzar();
+    var notCardCzarPlayer1 = (cardCzar.user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+    var notCardCzarPlayer2 = (cardCzar.user == 1) ? this.game._getPlayer(2) : this.game._getPlayer(1);
+
+    test.ok(this.game.answer(notCardCzarPlayer1.user, notCardCzarPlayer1.hand[0]));
+    test.ok(this.game.answer(notCardCzarPlayer2.user, notCardCzarPlayer2.hand[0]));
+    test.ok(!this.game.lockAnswers(notCardCzarPlayer1.user));
+    test.done();
+  },
+  'lock answers works iff all active players have answered': function (test) {
+    var cardCzar = this.game._getCardCzar();
+    var notCardCzarPlayer1 = (cardCzar.user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+    var notCardCzarPlayer2 = (cardCzar.user == 1) ? this.game._getPlayer(2) : this.game._getPlayer(1);
+
+    test.ok(!this.game.lockAnswers(cardCzar.user));
+    test.ok(this.game.answer(notCardCzarPlayer1.user, notCardCzarPlayer1.hand[0]));
+    test.ok(!this.game.lockAnswers(cardCzar.user));
+    test.ok(this.game.answer(notCardCzarPlayer2.user, notCardCzarPlayer2.hand[0]));
+    test.ok(this.game.lockAnswers(cardCzar.user));
     test.done();
   },
   'vote fails': function (test) {

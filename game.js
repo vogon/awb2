@@ -130,6 +130,8 @@ module.exports = (function () {
   }
 
   Game.prototype.lockAnswers = function (user) {
+
+
     return false;
   }
 
@@ -179,10 +181,6 @@ module.exports = (function () {
     this._state = Status.WAIT_FOR_ANSWERS;
 
     return true;
-  }
-
-  Game.prototype._setNextCardCzar = function (player) {
-    return false;
   }
 
   Game.prototype._getState = function() {
