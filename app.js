@@ -85,16 +85,35 @@ var cloakConfig = {
   messages: {}
 };
 
-cloakConfig.messages[common.ROOM_CREATE] = function(msg, user) {
+cloakConfig.messages[common.ROOM_CREATE] = function (msg, user) {
   var room = cloak.createRoom('butts', 5);
 
   room.addMember(user);
 }
 
-cloakConfig.messages[common.ROOM_SEND_CHAT] = function(msg, user) {
+cloakConfig.messages[common.ROOM_SEND_CHAT] = function (msg, user) {
   console.log('received chatsent: msg = ' + msg);
   user.getRoom().messageMembers(common.ROOM_CHAT_RECEIVED, { username: user.name, text: msg });
 };
+
+cloakConfig.messages[common.CHANGE_NAME] = function (msg, user) {
+  console.log('received changename: msg = ' + msg);
+
+  var oldUsername = user.name, newUsername = msg;
+
+  user.name = newUsername;
+
+  user.message(common.YOU_CHANGED_NAME, { username: newUsername });
+
+  // send other-entered message to everyone except the person joining
+  // future cloak pull request: room.messageMembersExcept()
+  _(user.getRoom().members).forEach(function (member) {
+    if (user != member) {
+      member.message(common.OTHER_CHANGED_NAME, { oldUsername: oldUsername, newUsername: newUsername });
+    }
+  });
+
+}
 
 var port = process.env['PORT'] || 80;
 

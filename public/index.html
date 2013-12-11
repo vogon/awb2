@@ -6,6 +6,11 @@
     <link rel="stylesheet" href="/less/main.css"/>
 </head>
 <body>
+    <form id="change-name-form">
+        <input id="new-name" type="text"/>
+        <input type="submit" value="change name"/>
+    </form>
+
     <div id="chat-log">
         hey there what's goin on
         <br />
@@ -13,7 +18,7 @@
 
     <form id="chat-form">
         <input id="chat-line" type="text"/>
-        <input type="submit"/>
+        <input type="submit" value="send"/>
     </form>
 
     <script id="chatlog-msg-template" type="text/x-handlebars-template">
@@ -31,6 +36,18 @@
     <script id="chatlog-otherjoined-template" type="text/x-handlebars-template">
         <div class="chatlog-line">
             <span class="username">{{username}}</span> joined room &quot;<span class="roomname">{{roomname}}</span>&quot;.
+        </div>
+    </script>
+
+    <script id="chatlog-younick-template" type="text/x-handlebars-template">
+        <div class="chatlog-line">
+            You changed your name to <span class="username">{{username}}</span>.
+        </div>
+    </script>
+
+    <script id="chatlog-othernick-template" type="text/x-handlebars-template">
+        <div class="chatlog-line">
+            <span class="username">{{oldUsername}}</span> changed their name to <span class="username">{{newUsername}}</span>.
         </div>
     </script>
 

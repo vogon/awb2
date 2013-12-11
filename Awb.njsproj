@@ -12,7 +12,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>8ef0571c-96fe-4de3-946e-deab56feb94a</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>test\all.js</StartupFile>
+    <StartupFile>app.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>

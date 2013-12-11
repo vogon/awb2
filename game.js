@@ -7,7 +7,6 @@ var Status = {
   WAIT_FOR_ROUND_START: 1,
   WAIT_FOR_ANSWERS: 2,
   WAIT_FOR_JUDGMENT: 3,
-  WAIT_FOR_ROUND_END: 4,
   GAME_OVER: 5
 };
 
@@ -308,7 +307,7 @@ module.exports = (function () {
     return dealt;
   }
 
-  Game.prototype._dealToPlayer = function(player) {
+  Game.prototype._dealToPlayer = function (player) {
     var oldHandSize = _(player.hand).size();
     var newCards = this._dealWhiteCards(10 - oldHandSize);
 
