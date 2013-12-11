@@ -56,6 +56,16 @@ cloakConfig.messages[common.OTHER_CHANGED_NAME] = function (msg, user) {
 cloakConfig.messages[common.GAME_LIST] = function (msg, user) {
   $('#game-list').html(gameListTemplate(msg));
 
+  $('#game-list .game').click(function (e) {
+    // grab the <li> the user clicked on
+    var listItem = e.delegateTarget;
+
+    // find the id of the game associated with that <li>
+    var idElement = $(listItem).find('.game-id');
+
+    cloak.message(common.JOIN_GAME, { id: idElement.text() });
+  });
+
   $('.create-game').click(function (e) {
     cloak.message(common.CREATE_GAME);
   });

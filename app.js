@@ -93,16 +93,35 @@ var cloakConfig = {
   messages: {}
 };
 
+function makeRoomForGame(game) {
+  var room = cloak.createRoom(game.name, 4);
+  room.data = game;
+
+  return room;
+}
+
 cloakConfig.messages[common.CREATE_GAME] = function (msg, user) {
   var game = new Game();
-  var room = cloak.createRoom(game.name, 4);
+  var room = makeRoomForGame(game);
 
-  room.data = game;
   games.push(game);
   user.joinRoom(room);
   
   var gameList = _(games).map(makeClientGameView);
-  user.message(common.GAME_LIST, { games: gameList });
+  cloak.messageAll(common.GAME_LIST, { games: gameList });
+};
+
+cloakConfig.messages[common.JOIN_GAME] = function (msg, user) {
+  var id = msg.id;
+  var game = _(games).findWhere({ id: id });
+  var room = _(cloak.getRooms()).findWhere({ data: game });
+
+  if (!room) {
+    // game doesn't have a room right now, create one
+    room = makeRoomForGame(game);
+  }
+
+  user.joinRoom(room);
 };
 
 cloakConfig.messages[common.ROOM_SEND_CHAT] = function (msg, user) {

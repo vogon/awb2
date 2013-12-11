@@ -5,6 +5,7 @@
 exports.GAME_LIST = 'gamelist';
 
 exports.CREATE_GAME = 'creategame';
+exports.JOIN_GAME = 'joingame';
 
 exports.CHANGE_NAME = 'nick';
 exports.YOU_CHANGED_NAME = 'younick';

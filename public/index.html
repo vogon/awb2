@@ -30,7 +30,9 @@
         {{#each games}}
         <li class="game">
             <p class="name">{{name}}</p>
-            <p></p>
+            <p>
+                <span class="game-id" hidden>{{id}}</span>
+            </p>
         </li>
         {{/each}}
         <li class="create-game">+ create a new game</li>
