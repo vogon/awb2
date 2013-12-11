@@ -70,7 +70,7 @@ exports['leave'] = {
 //   lock answers fails
 //   vote fails
 //   new round works iff there are >= 3 players, state transition to awaiting answers
-exports['pre-start functional'] = {
+exports['pre-start'] = {
   setUp: function (callback) {
     this.game = new Game();
     callback();
@@ -125,7 +125,7 @@ exports['pre-start functional'] = {
 //   lock answers works iff the locking player is the card czar and all active players have answered
 //   vote fails
 //   new round fails
-exports['awaiting answers functional'] = {
+exports['awaiting answers'] = {
   setUp: function (callback) {
     this.game = new Game();
     this.game.join(0);
@@ -182,8 +182,8 @@ exports['awaiting answers functional'] = {
   },
   "lock answers fails if locking player isn't card czar": function (test) {
     var cardCzar = this.game._getCardCzar();
-    var notCardCzarPlayer1 = (cardCzar.user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
-    var notCardCzarPlayer2 = (cardCzar.user == 1) ? this.game._getPlayer(2) : this.game._getPlayer(1);
+    var notCardCzarPlayer1 = (cardCzar.user <= 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+    var notCardCzarPlayer2 = (cardCzar.user <= 1) ? this.game._getPlayer(2) : this.game._getPlayer(1);
 
     test.ok(this.game.answer(notCardCzarPlayer1.user, notCardCzarPlayer1.hand[0]));
     test.ok(this.game.answer(notCardCzarPlayer2.user, notCardCzarPlayer2.hand[0]));
@@ -192,8 +192,8 @@ exports['awaiting answers functional'] = {
   },
   'lock answers works iff all active players have answered': function (test) {
     var cardCzar = this.game._getCardCzar();
-    var notCardCzarPlayer1 = (cardCzar.user == 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
-    var notCardCzarPlayer2 = (cardCzar.user == 1) ? this.game._getPlayer(2) : this.game._getPlayer(1);
+    var notCardCzarPlayer1 = (cardCzar.user <= 0) ? this.game._getPlayer(1) : this.game._getPlayer(0);
+    var notCardCzarPlayer2 = (cardCzar.user <= 1) ? this.game._getPlayer(2) : this.game._getPlayer(1);
 
     test.ok(!this.game.lockAnswers(cardCzar.user));
     test.ok(this.game.answer(notCardCzarPlayer1.user, notCardCzarPlayer1.hand[0]));
@@ -223,7 +223,7 @@ exports['awaiting answers functional'] = {
 //     if a player has won, state transition to finished;
 //     otherwise, state transition to awaiting new round
 //   new round fails
-exports['awaiting vote functional'] = {
+exports['awaiting vote'] = {
 
 };
 
@@ -234,7 +234,7 @@ exports['awaiting vote functional'] = {
 //   lock answers fails
 //   vote fails
 //   new round works iff there are >= 3 players, state transition to awaiting answers
-exports['awaiting new round functional'] = {
+exports['awaiting new round'] = {
 
 };
 
@@ -245,6 +245,6 @@ exports['awaiting new round functional'] = {
 //   lock answers fails
 //   vote fails
 //   new round fails
-exports['finished functional'] = {
+exports['finished'] = {
 
 };

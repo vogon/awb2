@@ -130,9 +130,25 @@ module.exports = (function () {
   }
 
   Game.prototype.lockAnswers = function (user) {
+    var g = this;
+    var allAnswersSubmitted = _(this._activePlayers()).every(function (player) {
+      return (player == g._currentCardCzar) || (!!g._currentAnswers[player.id]);
+    });
 
-
-    return false;
+    if (this._state != Status.WAIT_FOR_ANSWERS) {
+      // not waiting for answers right now
+      return false;
+    } else if (!allAnswersSubmitted) {
+      // at least one active player hasn't answered
+      return false;
+    } else if (user != g._currentCardCzar.user) {
+      // only the card czar can lock in answers
+      return false;
+    } else {
+      // everything's cool
+      this._state = Status.WAIT_FOR_JUDGMENT;
+      return true;
+    }
   }
 
   Game.prototype.vote = function (user, answer) {
