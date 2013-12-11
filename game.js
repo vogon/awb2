@@ -23,6 +23,10 @@ module.exports = (function () {
     this.players = [];
     this._nextPlayerId = 1;
 
+    this._winFn = function (player) {
+      return player.score >= 3;
+    }
+
     this._state = Status.NOT_STARTED;
 
     this._whiteCards = cah.whiteCards;
@@ -50,7 +54,10 @@ module.exports = (function () {
   }
 
   Game.prototype.join = function (user) {
-    if (_(this._activePlayers()).size() >= this._n) {
+    if (this._state == Status.FINISHED) {
+      // game's already over
+      return false;
+    } else if (_(this._activePlayers()).size() >= this._n) {
       // game's already full
       return false;
     } else {
@@ -64,7 +71,7 @@ module.exports = (function () {
       this.players.push(player);
 
       // if we're currently waiting for answers, deal the player in
-      if (this._getState() == Status.WAIT_FOR_ANSWERS) {
+      if (this._state == Status.WAIT_FOR_ANSWERS) {
         this._dealToPlayer(player);
       }
 
@@ -101,8 +108,14 @@ module.exports = (function () {
   Game.prototype.answer = function (user, answer) {
     var player = this._getPlayer(user);
 
-    if (!player) {
+    if (this._state != Status.WAIT_FOR_ANSWERS) {
+      // not the time for answering
+      return false;
+    } else if (!player) {
       // user isn't in this game
+      return false;
+    } else if (player.hasLeft) {
+      // player left the game
       return false;
     } else {
       // card czar can't answer
@@ -196,6 +209,15 @@ module.exports = (function () {
     // change state to awaiting answers
     this._state = Status.WAIT_FOR_ANSWERS;
 
+    return true;
+  }
+
+  Game.prototype._endGame = function () {
+    if (this._state != Status.NOT_STARTED && this._state != Status.WAIT_FOR_ROUND_START) {
+      return false;
+    }
+
+    this._state = Status.FINISHED;
     return true;
   }
 
